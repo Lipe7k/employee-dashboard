@@ -20,7 +20,7 @@
         <ul id="lista-funcionarios"></ul>
         </div>
       <button id="btnSearch" onclick="searchEmployee()"><i class="fa fa-search" aria-hidden="true"></i> Buscar</button>
-      <button id="addEmployee" onclick="addEmployee()"><i class="fa fa-user-plus" aria-hidden="true"></i> <label>Adicionar</label></button>
+      <button id="addEmployee" onclick="openScreen(addEmployeeModal)"><i class="fa fa-user-plus" aria-hidden="true"></i> <label>Adicionar</label></button>
     </div>
     <div class="employees-box">
       <h3>Funcionários</h3>
@@ -34,7 +34,7 @@
   <div id="screen-employee">
     <div class="infos-employee">
       <div class="top-info">
-        <button id="btnClose" onclick="closeScreen()"><i class="fa fa-times" aria-hidden="true"></i></button>
+        <button id="btnClose" onclick="closeScreen(screenEmployee)"><i class="fa fa-times" aria-hidden="true"></i></button>
         <h2 id="name-employee">Felipe</h2>
         <p id="cargo-employee">Engenheiro de software</p>
       </div>
@@ -50,10 +50,43 @@
               <input type="number" name="" id="aumento" placeholder="Aumento em porcentagem">
               <button id="btnConfirmAumento">Confirmar</button>
             </div>
-            <button id="btnDemitir" onclick="demitir()"><i class="fa fa-trash-o" aria-hidden="true"></i> Demitir funcionário</button>
+            <button id="btnDemitir" onclick="demitir()"><i class="fa-regular fa-trash-can" aria-hidden="true"></i> Demitir funcionário</button>
         </div>
       </div>
 
+    </div>
+  </div>
+
+  
+  <div class="modal fade" id="addEmployeeModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Adicionar Funcionário</h5>
+          <p>Preencha os dados do novo funcionário</p>
+          <button id="btnClose" onclick="closeScreen(addEmployeeModal)"><i class="fa fa-times" aria-hidden="true"></i></button>
+        </div>
+        <div class="modal-body">
+          <form>
+            <div class="mb-3">
+              <label for="employeeName" class="form-label">Nome</label>
+              <input type="text" class="form-control" id="employeeName" placeholder="Nome do funcionário">
+            </div>
+            <div class="mb-3">
+              <label for="employeeRole" class="form-label">Cargo</label>
+              <input type="text" class="form-control" id="employeeRole" placeholder="Cargo do funcionário">
+            </div>
+            <div class="mb-3">
+              <label for="employeeSalary" class="form-label">Salário (R$)</label>
+              <input type="number" class="form-control" id="employeeSalary" placeholder="0,00">
+            </div>
+          </form>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-success" onclick="addEmployee()">Adicionar Funcionário</button>
+          <button type="button" class="btn btn-outline-custom" data-bs-dismiss="modal" onclick="closeScreen(addEmployeeModal)">Cancelar</button>
+        </div>
+      </div>
     </div>
   </div>
 

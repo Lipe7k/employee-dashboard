@@ -5,10 +5,6 @@ const funcionarios = [
     {nome: "Fellipe Teixeira", cargo: "Programador Backend", salario: 12392},
     {nome: "Mariana Almeida", cargo: "Analista de Dados", salario: 8920},
     {nome: "Lucas Barbosa", cargo: "Designer UI/UX", salario: 7350},
-    {nome: "Bruna Gonçalves", cargo: "Gerente de Projetos", salario: 11200},
-    {nome: "Rafael Cardoso", cargo: "Estagiário de TI", salario: 1500},
-    {nome: "Carla Souza", cargo: "Especialista em Segurança da Informação", salario: 10400},
-    {nome: "Thiago dos Santos", cargo: "Administrador de Redes", salario: 6790}
   ]
   
   
@@ -17,6 +13,8 @@ const funcionarios = [
   const screenEmployee = document.querySelector("#screen-employee")
   const infoEmployee = document.querySelector(".infos-employee")
   const lista = document.getElementById("lista-funcionarios");
+
+  const addEmployeeModal = document.querySelector("#addEmployeeModal")
   
 
   nomeInput.addEventListener("keydown", (e) => {
@@ -51,18 +49,18 @@ const funcionarios = [
   });
   
 
-  function openScreen(){
-    screenEmployee.classList.add("active")
+  function openScreen(screen){
+    screen.classList.add("active")
   }
   
   screenEmployee.addEventListener("click", (e) => {
     if(e.target.id === "screen-employee" ){
-      closeScreen()
+      closeScreen(screenEmployee)
     }
   })
   
-  function closeScreen(){
-    screenEmployee.classList.remove("active")
+  function closeScreen(screen){
+    screen.classList.remove("active")
   }
   
   function removeAcentos(str) {
@@ -94,7 +92,7 @@ const funcionarios = [
       notification(`${funcionario.nome} foi demitido com sucesso!`);
     }
 
-    closeScreen();
+    closeScreen(screenEmployee);
     showEmployee(); 
   }
   
@@ -112,22 +110,25 @@ const funcionarios = [
     const nome = nameEmployee.textContent;
     const funcionario = funcionarios.find(f => removeAcentos(f.nome.toLowerCase()) === removeAcentos(nome.toLowerCase()));
   
-    if (!funcionario) {
-      notification("Funcionário não encontrado!");
-      return;
-    }
   
     const aumentoPercentual = parseFloat(inputAumento.value);
   
     if (isNaN(aumentoPercentual) || aumentoPercentual <= 0) {
       notification("Aumento inválido");
-    } else {
+    } 
+    else if(funcionario.salario >= 150000){
+      notification("Salário maximo atingido")
+    }
+    else {
       funcionario.salario += (aumentoPercentual / 100) * funcionario.salario;
+      if(funcionario.salario > 150000){
+        funcionario.salario = 150000
+      }
       notification(`${funcionario.nome} recebeu aumento! Novo salário: ${funcionario.salario.toLocaleString("pt-BR", {style: "currency", currency: "BRL"})}`);
     }
   
     inputAumento.value = ""; 
-    closeScreen();
+    closeScreen(screenEmployee);
     btnAumento.style.display = "block";
     boxAumento.style.display = "none";
     showEmployee();
@@ -139,7 +140,7 @@ const funcionarios = [
       nameEmployee.textContent = funcionario.nome
       cargoEmployee.textContent = funcionario.cargo
       salario.textContent = funcionario.salario.toLocaleString("pt-BR", {style: "currency", currency: "BRL"})
-      openScreen()
+      openScreen(screenEmployee)
     } else {
       notification("Funcionário não encontrado! ")
     }
@@ -213,3 +214,27 @@ const funcionarios = [
   )}
   
   showEmployee()
+
+
+const addEmployeeName = document.querySelector("#employeeName")
+const addEmployeeCargo = document.querySelector("#employeeRole")
+const addEmployeeSalario = document.querySelector("#employeeSalary")
+
+function addEmployee(){
+  const newEmployee = {
+    nome: addEmployeeName.value.trim(),
+    cargo: addEmployeeCargo.value.trim(),
+    salario: parseFloat(addEmployeeSalario.value)
+  }
+
+  if (!newEmployee.nome || !newEmployee.cargo || isNaN(newEmployee.salario)) {
+    notification("Por favor, preencha todos os campos corretamente.");
+    return;
+  }
+
+  funcionarios.push(newEmployee)
+  showEmployee()
+  closeScreen(addEmployeeModal)
+  
+  notification(`${newEmployee.nome} foi adicionado com sucesso!`)
+}
