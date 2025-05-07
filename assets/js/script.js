@@ -1,14 +1,14 @@
 const funcionarios = [
-    {nome: "Felipe", cargo: "Engenheiro de software", salario: 16520},
-    {nome: "João", cargo: "Segurança", salario: 2500},
-    {nome: "Enzo", cargo: "Técnico em Hardware", salario: 2133},
-    {nome: "Fellipe", cargo: "Programador Backend", salario: 12392},
-    {nome: "Mariana", cargo: "Analista de Dados", salario: 8920},
-    {nome: "Lucas", cargo: "Designer UI/UX", salario: 7350},
-    {nome: "Bruna", cargo: "Gerente de Projetos", salario: 11200},
-    {nome: "Rafael", cargo: "Estagiário de TI", salario: 1500},
-    {nome: "Carla", cargo: "Especialista em Segurança da Informação", salario: 10400},
-    {nome: "Thiago", cargo: "Administrador de Redes", salario: 6790}
+    {nome: "Felipe Falcirolli", cargo: "Engenheiro de software", salario: 16520},
+    {nome: "João Grigorio", cargo: "Segurança", salario: 2500},
+    {nome: "Enzo Damasceno", cargo: "Técnico em Hardware", salario: 2133},
+    {nome: "Fellipe Teixeira", cargo: "Programador Backend", salario: 12392},
+    {nome: "Mariana Almeida", cargo: "Analista de Dados", salario: 8920},
+    {nome: "Lucas Barbosa", cargo: "Designer UI/UX", salario: 7350},
+    {nome: "Bruna Gonçalves", cargo: "Gerente de Projetos", salario: 11200},
+    {nome: "Rafael Cardoso", cargo: "Estagiário de TI", salario: 1500},
+    {nome: "Carla Souza", cargo: "Especialista em Segurança da Informação", salario: 10400},
+    {nome: "Thiago dos Santos", cargo: "Administrador de Redes", salario: 6790}
   ]
   
   
@@ -16,7 +16,41 @@ const funcionarios = [
   const searchInput = document.querySelector("#btnSearch")
   const screenEmployee = document.querySelector("#screen-employee")
   const infoEmployee = document.querySelector(".infos-employee")
+  const lista = document.getElementById("lista-funcionarios");
   
+
+  nomeInput.addEventListener("keydown", (e) => {
+    console.log(e)
+    if (e.keyCode === 13) {
+      if (nomeInput.value) {
+        searchEmployee()
+      }
+    }
+  })
+
+  nomeInput.addEventListener("input", () => {
+    const texto = nomeInput.value.toLowerCase();
+    lista.innerHTML = "";
+  
+    if (texto === "") return; 
+  
+    const filtrados = funcionarios.filter(f => f.nome.toLowerCase().includes(texto));
+  
+    filtrados.forEach(f => {
+      const li = document.createElement("li");
+      li.textContent = f.nome;
+      li.style.cursor = "pointer";
+  
+      li.addEventListener("click", () => {
+        nomeInput.value = f.nome;
+        lista.innerHTML = ""; 
+      });
+  
+      lista.appendChild(li);
+    });
+  });
+  
+
   function openScreen(){
     screenEmployee.classList.add("active")
   }
@@ -35,95 +69,122 @@ const funcionarios = [
     return str.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
   }
   
-  function btnAumento(funcionario) {
-    const btnAumento = document.createElement("button")
-    btnAumento.classList.add("btn-aumento")
-    btnAumento.style.backgroundColor = "green"
-    btnAumento.textContent = "Dar aumento"
+
+
+
+  const btnAumento = document.querySelector("#btnAumento")
+  const btnDemitir = document.querySelector("#btnDemitir")
+  const nameEmployee = document.querySelector("#name-employee")
+  const cargoEmployee = document.querySelector("#cargo-employee")
+  const salario = document.querySelector("#salario")
+
+  function demitir() {
+    const nome = nameEmployee.textContent;
+    const funcionario = funcionarios.find(f => removeAcentos(f.nome.toLowerCase()) === removeAcentos(nome.toLowerCase()));
+  
+    if (!funcionario) {
+      notification("Funcionário não encontrado!");
+      return;
+    }
   
     
-    const aumentoContainer = document.createElement("div")
-    aumentoContainer.classList.add("aumento-box")
+    const index = funcionarios.indexOf(funcionario);
+    if (index !== -1) {
+      funcionarios.splice(index, 1);
+      notification(`${funcionario.nome} foi demitido com sucesso!`);
+    }
+
+    closeScreen();
+    showEmployee(); 
+  }
   
-    btnAumento.addEventListener("click", () => {
-      
-      aumentoContainer.innerHTML = ""
+  const boxAumento = document.querySelector(".aumento-box")
+  const inputAumento = document.querySelector("#aumento")
+  const btnConfirmAumento = document.querySelector("#btnConfirmAumento")
+
+
+  function aumento() {
+    btnAumento.style.display = "none";
+    boxAumento.style.display = "flex";
+  }
   
-      const inputValorAumento = document.createElement("input")
-      inputValorAumento.type = "number"
-      inputValorAumento.placeholder = "Valor do aumento em %"
+  btnConfirmAumento.addEventListener("click", () => {
+    const nome = nameEmployee.textContent;
+    const funcionario = funcionarios.find(f => removeAcentos(f.nome.toLowerCase()) === removeAcentos(nome.toLowerCase()));
   
-      const btnValorAumento = document.createElement("button")
-      btnValorAumento.style.backgroundColor = "black"
-      btnValorAumento.textContent = "Confirmar aumento"
+    if (!funcionario) {
+      notification("Funcionário não encontrado!");
+      return;
+    }
   
-      btnValorAumento.addEventListener("click", () => {
-        const valor = Number(inputValorAumento.value)
-        if (!valor || isNaN(valor)) {
-          alert("Coloque um valor válido!")
-          return
-        }
+    const aumentoPercentual = parseFloat(inputAumento.value);
   
-        funcionario.salario += (inputValorAumento.value / 100) * funcionario.salario
-        alert(`Novo salário: R$ ${funcionario.salario.toFixed(2)}`)
-        searchEmployee() 
-      })
+    if (isNaN(aumentoPercentual) || aumentoPercentual <= 0) {
+      notification("Aumento inválido");
+    } else {
+      funcionario.salario += (aumentoPercentual / 100) * funcionario.salario;
+      notification(`${funcionario.nome} recebeu aumento! Novo salário: ${funcionario.salario.toLocaleString("pt-BR", {style: "currency", currency: "BRL"})}`);
+    }
   
-      aumentoContainer.append(inputValorAumento, btnValorAumento)
-    })
+    inputAumento.value = ""; 
+    closeScreen();
+    btnAumento.style.display = "block";
+    boxAumento.style.display = "none";
+    showEmployee();
+  });
   
-    infoEmployee.appendChild(btnAumento)
-    infoEmployee.appendChild(aumentoContainer)
+
+  function exibirFuncionario(funcionario) {
+    if(funcionario){
+      nameEmployee.textContent = funcionario.nome
+      cargoEmployee.textContent = funcionario.cargo
+      salario.textContent = funcionario.salario.toLocaleString("pt-BR", {style: "currency", currency: "BRL"})
+      openScreen()
+    } else {
+      notification("Funcionário não encontrado! ")
+    }
   }
   
   
-  function btnVoltar(){
-      if (!document.querySelector(".btn-voltar")) {
-      const btnBack = document.createElement("button")
-      btnBack.classList.add("btn-voltar")
-      btnBack.style.backgroundColor = "grey"
-      btnBack.textContent = "Voltar"
-      btnBack.addEventListener("click", closeScreen)
-      infoEmployee.appendChild(btnBack)
-    }
+
+  function limpaEmployee(){
+    nameEmployee.textContent = ""
+    cargoEmployee.textContent = ""
+    salario.textContent = ""
   }
   
   function searchEmployee(){
-    infoEmployee.innerHTML = ""
-    openScreen()
+    limpaEmployee()
     const nome = nomeInput.value
     const funcionario = funcionarios.find(f => removeAcentos(f.nome.toLowerCase()) === removeAcentos(nome.toLowerCase()))
-  
-      if (funcionario) {
-      infoEmployee.innerHTML = `
-        <p>Nome: ${funcionario.nome}</p>
-        <p>Cargo: ${funcionario.cargo}</p>
-        <p>Salário: R$ ${funcionario.salario.toFixed(2).replace(".", ",")}</p>
-      `
-      const btnDemitir = document.createElement("button")
-      btnDemitir.innerText = "Demitir"
-      btnDemitir.addEventListener("click", () => {
-      const nome = nomeInput.value
-      const index = funcionarios.findIndex(f => removeAcentos(f.nome.toLowerCase()) === removeAcentos(nome.toLowerCase()))
-  
-      if (index !== -1) {
-        if (confirm(`Tem certeza que deseja demitir ${funcionario.nome}?`)) {
-          funcionarios.splice(index, 1)
-          alert("Funcionário demitido!")
-          showEmployee()
-          closeScreen()
-        }
-      }
-  
-  })
-      btnAumento(funcionario)
-      infoEmployee.appendChild(btnDemitir)
-      btnVoltar()
-    } else {
-      infoEmployee.innerHTML = "<p>Funcionário não encontrado</p>"
+    
+    if (!funcionario) {
+      notification("Funcionário não encontrado! ")
+      return;
     }
   
+    exibirFuncionario(funcionario)
+    showEmployee()
   }
+  
+  
+  function notification(msg){
+
+    Toastify({
+      text: msg,
+      duration: 3000,
+      close: true, 
+      gravity: "bottom", 
+      position: "right", 
+      backgroundColor: "white",
+      stopOnFocus: true,
+      style: {
+        color: "black"
+      },
+      className: "toast-custom"
+    }).showToast();
+  }
+  
   
   
   function showEmployee(){
@@ -132,11 +193,23 @@ const funcionarios = [
   
   
     funcionarios.forEach(f => {
+      const div = document.createElement("div")
       const li = document.createElement("li")
-      li.innerText = `${f.nome} - ${f.cargo}`
+      li.classList.add("employee")
+      const p = document.createElement("p")
+      div.innerHTML = `<h4>${f.nome}</h4>
+        <p>${f.cargo}</p>`
+      p.innerText = f.salario.toLocaleString("pt-BR", {style: "currency", currency: "BRL"})
+
+      li.appendChild(div)
+      li.appendChild(p)
   
       employeeList.appendChild(li)
-    })
-  }
+
+      li.addEventListener("click", () =>{
+        exibirFuncionario(f)
+        })
+      }    
+  )}
   
   showEmployee()
