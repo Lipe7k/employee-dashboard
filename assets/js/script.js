@@ -221,6 +221,7 @@ const addEmployeeCargo = document.querySelector("#employeeRole")
 const addEmployeeSalario = document.querySelector("#employeeSalary")
 
 function addEmployee(){
+
   const newEmployee = {
     nome: addEmployeeName.value.trim(),
     cargo: addEmployeeCargo.value.trim(),
@@ -231,10 +232,18 @@ function addEmployee(){
     notification("Por favor, preencha todos os campos corretamente.");
     return;
   }
+  if(funcionarios.some(f => f.nome.toLowerCase() === newEmployee.nome.toLowerCase())){
+    notification("Funcionário já existe!");
+    return;
+  }
 
   funcionarios.push(newEmployee)
   showEmployee()
   closeScreen(addEmployeeModal)
   
   notification(`${newEmployee.nome} foi adicionado com sucesso!`)
+
+  addEmployeeName.value = ""
+  addEmployeeCargo.value = ""
+  addEmployeeSalario.value = ""
 }
